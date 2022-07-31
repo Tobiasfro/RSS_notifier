@@ -54,7 +54,7 @@ def send_notification(article_title, article_url):
     msg['From'] = 'my@gmail.com'
     msg['To'] = 'my_main@mail.com'
     smtp_server.send_message(msg)
-    smtp_server.quit() 
+    smtp_server.quit()
 
 if __name__ == '__main__':
     read_article_feed()
