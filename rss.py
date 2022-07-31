@@ -1,3 +1,8 @@
+'''rss.py: RSS notifier created with the help of the tutorial found here
+           https://fedoramagazine.org/never-miss-magazines-article-build-rss-notification-system/
+
+           All credit goes to the author of that article'''
+
 import sqlite3
 import smtplib
 from email.mime.text import MIMEText
@@ -24,15 +29,31 @@ def read_article_feed():
     for article in feed['entries']:
         title = article['title']
         date_published = article['published']
+        link = article['link']
         if article_is_not_db(title, date_published):
             print('Title: ' + title)
             print('Published ' + date_published)
-            print('Link: ' + article['link'] + '\n')
+            print('Link: ' + link + '\n')
+            #send_notification(title, link)
             add_article_to_db(title, date_published)
     db.execute('SELECT * from magazine')
-    print('All entries: ', db.fetchall())
+    print('All entries:')
+    for entry in db.fetchall():
+        print(str(entry) + '\n')
     db.execute('SELECT COUNT(1) from magazine')
-    print('Number of entries in database: ', db.fetchall())
+    print('Number of entries in database:', db.fetchall()[0][0])
+
+def send_notification(article_title, article_url):
+    smtp_server = smtplib.SMTP('smtp.gmail.com', 587)
+    smtp_server.ehlo()
+    smtp_server.starttls()
+    smtp_server.login('my@gmail.com', 'my_password')
+    msg = MIMEText(f'\nHi there is a new Fedora Magazine article : {article_title}.\nYou can read it here {article_url}')
+    msg['Subject'] = 'New Article Available'
+    msg['From'] = 'my@gmail.com'
+    msg['To'] = 'my_main@mail.com'
+    smtp_server.send_message(msg)
+    smtp_server.quit() 
 
 if __name__ == '__main__':
     read_article_feed()
