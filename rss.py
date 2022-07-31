@@ -26,6 +26,7 @@ def add_article_to_db(article_title, article_date):
 
 def read_article_feed():
     feed = feedparser.parse('https://fedoramagazine.org/feed/')
+    print('New entries:')
     for article in feed['entries']:
         title = article['title']
         date_published = article['published']
@@ -37,7 +38,7 @@ def read_article_feed():
             #send_notification(title, link)
             add_article_to_db(title, date_published)
     db.execute('SELECT * from magazine')
-    print('All entries:')
+    print('Existing entries:')
     for entry in db.fetchall():
         print(str(entry) + '\n')
     db.execute('SELECT COUNT(1) from magazine')
